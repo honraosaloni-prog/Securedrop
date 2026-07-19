@@ -1,0 +1,8 @@
+Initial commit: SecureDrop — secure browser-to-browser temporary workspace
+
+- Server: Express + Socket.IO signaling, node:sqlite persistence,
+  Zero-Trust auth middleware, rate limiting, background session
+  expiry/inactivity sweep
+- Client: React + Vite, WebCrypto ECDH/AES-GCM E2E encryption,
+  WebRTC DataChannel file/note/clipboard transfer, QR + code pairing
+- Docs: README.md (run/deploy) and ARCHITECTURE.md (security design)

@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Env files (never commit secrets)
+.env
+.env.local
+.env.*.local
+
+# Server runtime data (self-purging by design, never commit)
+server/data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Client build output
+client/dist/
+client/dist-ssr/
+
+# Logs
+npm-debug.log*
+*.log
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/
