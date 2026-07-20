@@ -6,6 +6,7 @@ clipboard text directly between them — end-to-end encrypted, peer-to-peer.
 The server relays pairing and WebRTC signaling only; it never sees file
 contents, notes, or clipboard text in plaintext, and never stores them.
 
+
 ## How it works
 
 1. **Host** opens SecureDrop and starts a session. The server issues a
