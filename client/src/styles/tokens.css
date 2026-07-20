@@ -1,0 +1,151 @@
+/* SecureDrop design tokens
+   -------------------------------------------------------------
+   Subject: two browsers forming a temporary, encrypted airlock.
+   Signature element: the "link beam" between two device glyphs
+   (pulses while pairing, locks solid once the encrypted channel
+   opens) paired with a draining countdown ring for session TTL —
+   the thesis, "temporary and secure," made visible.
+------------------------------------------------------------- */
+
+:root {
+  --bg: #090d15;
+  --surface: #121826;
+  --surface-2: #1a2333;
+  --border: #263148;
+  --text: #e8ecf4;
+  --text-dim: #8b96ac;
+  --text-faint: #5b6579;
+  --accent: #4fd1c5;       /* secure link / active state */
+  --accent-dim: #2a5b57;
+  --accent-2: #f0a868;     /* countdown / urgency */
+  --danger: #e5484d;
+  --success: #4fd1c5;
+
+  --font-display: 'JetBrains Mono', 'SFMono-Regular', ui-monospace, monospace;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow-card: 0 1px 0 rgba(255,255,255,0.03) inset, 0 20px 40px -20px rgba(0,0,0,0.6);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-image:
+    radial-gradient(circle at 15% 0%, rgba(79, 209, 197, 0.08), transparent 45%),
+    radial-gradient(circle at 85% 100%, rgba(240, 168, 104, 0.06), transparent 40%);
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  font-family: var(--font-body);
+}
+
+a { color: var(--accent); }
+
+::selection { background: var(--accent-dim); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+.mono { font-family: var(--font-display); letter-spacing: 0.02em; }
+
+.btn {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  padding: 0.7rem 1.1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.1s ease, background 0.15s ease;
+}
+.btn:hover { border-color: var(--accent); }
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-primary {
+  background: var(--accent);
+  color: #06201d;
+  border-color: var(--accent);
+}
+.btn-primary:hover { background: #6adfd4; }
+
+.btn-danger {
+  background: transparent;
+  color: var(--danger);
+  border-color: rgba(229, 72, 77, 0.4);
+}
+.btn-danger:hover { border-color: var(--danger); }
+
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-dim);
+}
+.btn-ghost:hover { color: var(--text); border-color: var(--border); }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+
+.input {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-family: var(--font-display);
+  letter-spacing: 0.08em;
+}
+.input:focus { border-color: var(--accent); }
+.input::placeholder { color: var(--text-faint); letter-spacing: normal; font-family: var(--font-body); }
+
+.label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-faint);
+  font-weight: 600;
+}
+
+.eyebrow {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
