@@ -91,4 +91,6 @@ connectivity across restrictive networks.
   you need durability of activity history beyond a session's lifetime,
   though the app's intent is that nothing outlives the session.
 
+##ScreenShot
+
 
