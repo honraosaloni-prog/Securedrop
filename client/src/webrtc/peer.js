@@ -9,19 +9,22 @@ import {
   decryptText,
 } from '../crypto/e2ee.js';
 
-const ICE_SERVERS = [{ urls: 'stun:stun.l.google.com:19302' }];
+const ICE_SERVERS = [
+  { urls: 'stun:stun.l.google.com:19302' },
+  {
+    urls: [
+      'stun:openrelay.metered.ca:80',
+      'turn:openrelay.metered.ca:80',
+      'turn:openrelay.metered.ca:443',
+      'turn:openrelay.metered.ca:443?transport=tcp',
+    ],
+    username: 'openrelayproject',
+    credential: 'openrelayproject',
+  },
+];
 const CHUNK_SIZE = 64 * 1024; // 64KB
 const BUFFERED_AMOUNT_LOW_THRESHOLD = 1 * 1024 * 1024; // 1MB
 
-/**
- * Manages: (1) the Socket.IO signaling channel, (2) the RTCPeerConnection
- * and its encrypted DataChannel, and (3) the small application-level
- * protocol used to move files/notes/clipboard text once connected.
- *
- * Every payload that goes over the DataChannel is already AES-GCM
- * encrypted with the ECDH-derived shared key before it ever touches
- * WebRTC (belt-and-suspenders on top of DTLS-SRTP transport encryption).
- */
 export function createSecureDropPeer({ apiBase, token, isHost, myPublicKeyJwk, myPrivateKey }) {
   const listeners = {
     peerConnected: [],
@@ -49,7 +52,7 @@ export function createSecureDropPeer({ apiBase, token, isHost, myPublicKeyJwk, m
   let pc;
   let channel;
   let sharedKey = null;
-  const incoming = new Map(); // transferId -> { meta, chunks: [] }
+  const incoming = new Map();
 
   function connectSocket() {
     socket = io(apiBase, { auth: { token } });
@@ -85,7 +88,7 @@ export function createSecureDropPeer({ apiBase, token, isHost, myPublicKeyJwk, m
   }
 
   async function ensurePeerConnection() {
-    if (pc) return;
+    if (pc && pc.signalingState !== 'closed') return;
     pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
 
     pc.onicecandidate = (e) => {
@@ -93,6 +96,7 @@ export function createSecureDropPeer({ apiBase, token, isHost, myPublicKeyJwk, m
     };
 
     pc.onconnectionstatechange = () => {
+      console.log('connectionState:', pc.connectionState);
       if (pc.connectionState === 'connected') emit('peerConnected');
       if (['disconnected', 'failed', 'closed'].includes(pc.connectionState)) {
         emit('peerDisconnected');
@@ -131,7 +135,6 @@ export function createSecureDropPeer({ apiBase, token, isHost, myPublicKeyJwk, m
       if (msg.type === 'file-meta') {
         incoming.set(msg.transferId, { meta: msg, chunks: [], received: 0 });
       } else if (msg.type === 'chunk-meta') {
-        // handled by pairing with the next binary message; store expected index
         incoming.get(msg.transferId)._expectedIndex = msg.index;
       } else if (msg.type === 'file-end') {
         const entry = incoming.get(msg.transferId);
@@ -149,7 +152,6 @@ export function createSecureDropPeer({ apiBase, token, isHost, myPublicKeyJwk, m
       return;
     }
 
-    // Binary chunk for the most recently announced transfer/index.
     const entry = [...incoming.values()].find((e) => e._expectedIndex !== undefined);
     if (!entry) return;
     const plain = await decryptBytes(sharedKey, new Uint8Array(data));
@@ -227,6 +229,9 @@ export function createSecureDropPeer({ apiBase, token, isHost, myPublicKeyJwk, m
     channel?.close();
     pc?.close();
     socket?.disconnect();
+    channel = null;
+    pc = null;
+    socket = null;
   }
 
   return {

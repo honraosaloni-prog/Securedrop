@@ -12,6 +12,8 @@ import { apiLimiter } from './middleware/rateLimit.js';
 import { attachSignaling } from './sockets/signaling.js';
 import { startCleanupJob } from './jobs/cleanup.js';
 import './db/db.js'; // initialize schema on boot
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const app = express();
 
@@ -26,6 +28,17 @@ app.use('/api/sessions', sessionRouter);
 app.use('/api/devices', deviceRouter);
 app.use('/api/transfers', transferRouter);
 app.use('/api/activity', activityRouter);
+
+// Serve the built React client from the same server + same origin.
+// Removes CORS entirely — one deployment, one URL.
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const clientDist = path.join(__dirname, '../../client/dist');
+app.use(express.static(clientDist));
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api') || req.path === '/health') return next();
+  res.sendFile(path.join(clientDist, 'index.html'));
+});
 
 // Generic error handler — never leak stack traces to clients.
 app.use((err, _req, res, _next) => {

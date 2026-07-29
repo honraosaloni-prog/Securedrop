@@ -32,17 +32,22 @@ export function attachSignaling(io) {
 
   io.on('connection', (socket) => {
     const room = socket.data.sessionId;
+
+    const existingRoom = io.sockets.adapter.rooms.get(room);
+    const peerAlreadyPresent = !!existingRoom && existingRoom.size > 0;
+
     socket.join(room);
     socket.to(room).emit('peer:online', { deviceId: socket.data.deviceId });
 
+    if (peerAlreadyPresent) {
+      socket.emit('peer:online', { deviceId: null });
+    }
+
     socket.on('signal', (msg) => {
-      // msg: { type: 'offer'|'answer'|'ice', payload }
       socket.to(room).emit('signal', { from: socket.data.deviceId, ...msg });
     });
 
     socket.on('clipboard:push', (msg) => {
-      // msg: { ciphertext, iv } — end-to-end encrypted by the sender using
-      // the shared ECDH-derived key; the server relays opaque bytes only.
       socket.to(room).emit('clipboard:push', { from: socket.data.deviceId, ...msg });
     });
 
