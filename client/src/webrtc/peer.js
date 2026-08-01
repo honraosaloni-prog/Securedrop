@@ -10,16 +10,21 @@ import {
 } from '../crypto/e2ee.js';
 
 const ICE_SERVERS = [
-  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:global.stun.twilio.com:3478' },
   {
-    urls: [
-      'stun:openrelay.metered.ca:80',
-      'turn:openrelay.metered.ca:80',
-      'turn:openrelay.metered.ca:443',
-      'turn:openrelay.metered.ca:443?transport=tcp',
-    ],
-    username: 'openrelayproject',
-    credential: 'openrelayproject',
+    urls: 'turn:global.turn.twilio.com:3478?transport=udp',
+    username: '676d39209efa1401e61ebd4fee5fcd4d3d6d8eac315cfb22b250a5b76d32221b',
+    credential: 'tM/6Z94E0U55VQopkVzmDTn3+m0PnDJ4yDvQ9rCsHUs=',
+  },
+  {
+    urls: 'turn:global.turn.twilio.com:3478?transport=tcp',
+    username: '676d39209efa1401e61ebd4fee5fcd4d3d6d8eac315cfb22b250a5b76d32221b',
+    credential: 'tM/6Z94E0U55VQopkVzmDTn3+m0PnDJ4yDvQ9rCsHUs=',
+  },
+  {
+    urls: 'turn:global.turn.twilio.com:443?transport=tcp',
+    username: '676d39209efa1401e61ebd4fee5fcd4d3d6d8eac315cfb22b250a5b76d32221b',
+    credential: 'tM/6Z94E0U55VQopkVzmDTn3+m0PnDJ4yDvQ9rCsHUs=',
   },
 ];
 const CHUNK_SIZE = 64 * 1024; // 64KB
