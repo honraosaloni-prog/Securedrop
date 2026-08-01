@@ -14,6 +14,7 @@ import { startCleanupJob } from './jobs/cleanup.js';
 import './db/db.js'; // initialize schema on boot
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { iceRouter } from './routes/ice.js';
 
 const app = express();
 
@@ -28,7 +29,7 @@ app.use('/api/sessions', sessionRouter);
 app.use('/api/devices', deviceRouter);
 app.use('/api/transfers', transferRouter);
 app.use('/api/activity', activityRouter);
-
+app.use('/api/ice-servers', iceRouter);
 // Serve the built React client from the same server + same origin.
 // Removes CORS entirely — one deployment, one URL.
 

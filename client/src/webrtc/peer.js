@@ -9,24 +9,7 @@ import {
   decryptText,
 } from '../crypto/e2ee.js';
 
-const ICE_SERVERS = [
-  { urls: 'stun:global.stun.twilio.com:3478' },
-  {
-    urls: 'turn:global.turn.twilio.com:3478?transport=udp',
-    username: '676d39209efa1401e61ebd4fee5fcd4d3d6d8eac315cfb22b250a5b76d32221b',
-    credential: 'tM/6Z94E0U55VQopkVzmDTn3+m0PnDJ4yDvQ9rCsHUs=',
-  },
-  {
-    urls: 'turn:global.turn.twilio.com:3478?transport=tcp',
-    username: '676d39209efa1401e61ebd4fee5fcd4d3d6d8eac315cfb22b250a5b76d32221b',
-    credential: 'tM/6Z94E0U55VQopkVzmDTn3+m0PnDJ4yDvQ9rCsHUs=',
-  },
-  {
-    urls: 'turn:global.turn.twilio.com:443?transport=tcp',
-    username: '676d39209efa1401e61ebd4fee5fcd4d3d6d8eac315cfb22b250a5b76d32221b',
-    credential: 'tM/6Z94E0U55VQopkVzmDTn3+m0PnDJ4yDvQ9rCsHUs=',
-  },
-];
+
 const CHUNK_SIZE = 64 * 1024; // 64KB
 const BUFFERED_AMOUNT_LOW_THRESHOLD = 1 * 1024 * 1024; // 1MB
 
@@ -93,8 +76,9 @@ export function createSecureDropPeer({ apiBase, token, isHost, myPublicKeyJwk, m
   }
 
   async function ensurePeerConnection() {
-    if (pc && pc.signalingState !== 'closed') return;
-    pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+  if (pc && pc.signalingState !== 'closed') return;
+  const iceServers = await fetchIceServers();
+  pc = new RTCPeerConnection({ iceServers });
 
     pc.onicecandidate = (e) => {
       if (e.candidate) socket.emit('signal', { type: 'ice', payload: e.candidate });
@@ -264,4 +248,14 @@ function base64ToBytes(b64) {
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
   return bytes;
+}
+
+async function fetchIceServers() {
+  try {
+    const res = await fetch(`${apiBase}/api/ice-servers`);
+    const data = await res.json();
+    return data.iceServers;
+  } catch {
+    return [{ urls: 'stun:stun.l.google.com:19302' }];
+  }
 }
