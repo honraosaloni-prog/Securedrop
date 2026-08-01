@@ -2,6 +2,8 @@ import express from 'express';
 import http from 'node:http';
 import cors from 'cors';
 import helmet from 'helmet';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Server } from 'socket.io';
 import { config } from './config.js';
 import { sessionRouter } from './routes/session.js';
@@ -15,6 +17,8 @@ import './db/db.js'; // initialize schema on boot
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { iceRouter } from './routes/ice.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 
@@ -34,6 +38,15 @@ app.use('/api/ice-servers', iceRouter);
 // Removes CORS entirely — one deployment, one URL.
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const clientDist = path.join(__dirname, '../../client/dist');
+app.use(express.static(clientDist));
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api') || req.path === '/health') return next();
+  res.sendFile(path.join(clientDist, 'index.html'));
+});
+
+// Serve the built React client from the same server + same origin.
+// Removes CORS entirely — one deployment, one URL.
 const clientDist = path.join(__dirname, '../../client/dist');
 app.use(express.static(clientDist));
 app.get('*', (req, res, next) => {
