@@ -2,7 +2,7 @@ SecureDrop
 
 A browser-to-browser secure temporary workspace. Pair two devices with a QR code or one-time code, then move files, photos, documents, notes, and clipboard text directly between them — end-to-end encrypted, peer-to-peer. The server relays pairing and WebRTC signaling only; it never sees file contents, notes, or clipboard text in plaintext, and never stores them.
      
-🔗 **[Live Demo]([https://securedrop-8hje.onrender.com/] )**
+🔗 **[Live Demo](https://securedrop-8hje.onrender.com/)**
 
 How it works
 Host opens SecureDrop and starts a session. The server issues a short-lived pairing code + QR token and a scoped JWT for that device.
